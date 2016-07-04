@@ -1,4 +1,7 @@
 # Changelog
+## 1.1.3
+
+* parser error in puppet 4
 
 ## 1.1.2
 
