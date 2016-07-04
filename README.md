@@ -44,8 +44,16 @@ This Puppet module provides secure configuration of your base OS with hardening.
   true if you want to use strong password checking in PAM using passwdqc
 * `passwdqc_options = "min=disabled,disabled,16,12,8"`
   set to any option line (as a string) that you want to pass to passwdqc
+* `manage_pam_unix = false`
+  true if you want pam_unix managed by this module
+* `enable_pw_history = true`
+  true if you want pam_unix to remember password history to prevent reuse of passwords (requires `manage_pam_unix = true`)
+* `pw_remember_last = 5`
+  the number of last passwords (e.g. 5 will prevent user to reuse any of her last 5 passwords)
 * `allow_change_user = false`
   if a user may use `su` to change his login
+* `ignore_users = []`
+  array of system user accounts that should _not be_ hardened (password disabled and shell set to `/usr/sbin/nologin`)
 * `enable_module_loading = true`
   true if you want to allowed to change kernel modules once the system is running (eg `modprobe`, `rmmod`)
 * `load_modules = []`
@@ -72,6 +80,39 @@ This Puppet module provides secure configuration of your base OS with hardening.
 After adding this module, you can use the class:
 
     class { 'os_hardening': }
+
+## Local Testing
+
+For local testing you can use vagrant and Virtualbox of VMWare to run tests locally. You will have to install Virtualbox and Vagrant on your system. See [Vagrant Downloads](http://downloads.vagrantup.com/) for a vagrant package suitable for your system. For all our tests we use `test-kitchen`. If you are not familiar with `test-kitchen` please have a look at [their guide](http://kitchen.ci/docs/getting-started).
+
+Next install test-kitchen:
+
+```bash
+# Install dependencies
+gem install bundler
+bundle install
+
+# Fetch tests
+bundle exec thor kitchen:fetch-remote-tests
+
+# Do lint checks
+bundle exec rake lint
+
+# Do spec checks
+bundle exec rake spec
+
+# fast test on one machine
+bundle exec kitchen test default-ubuntu-1204
+
+# test on Debian-based machines
+bundle exec kitchen test
+
+# for development
+bundle exec kitchen create default-ubuntu-1204
+bundle exec kitchen converge default-ubuntu-1204
+```
+
+For more information see [test-kitchen](http://kitchen.ci/docs/getting-started)
 
 ## Contributors + Kudos
 

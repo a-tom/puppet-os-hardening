@@ -23,11 +23,15 @@ class os_hardening(
   $allow_login_without_home = false,
 
   $allow_change_user        = false,
+  $ignore_users             = [],
 
   $passwdqc_enabled         = true,
   $auth_retries             = 5,
   $auth_lockout_time        = 600,
   $passwdqc_options         = 'min=disabled,disabled,16,12,8',
+  $manage_pam_unix          = false,
+  $enable_pw_history        = true,
+  $pw_remember_last         = 5,
 
   $root_ttys                =
     ['console','tty1','tty2','tty3','tty4','tty5','tty6'],
@@ -49,6 +53,13 @@ class os_hardening(
   $enable_core_dump         = false,
   $enable_stack_protection  = true,
 ) {
+  # Validate
+  # --------
+  validate_array($ignore_users)
+  validate_bool($manage_pam_unix)
+  validate_bool($enable_pw_history)
+  validate_integer($pw_remember_last)
+
   # Prepare
   # -------
 
@@ -79,12 +90,16 @@ class os_hardening(
   }
   class {'os_hardening::minimize_access':
     allow_change_user => $allow_change_user,
+    ignore_users      => $ignore_users,
   }
   class {'os_hardening::pam':
     passwdqc_enabled  => $passwdqc_enabled,
     auth_retries      => $auth_retries,
     auth_lockout_time => $auth_lockout_time,
     passwdqc_options  => $passwdqc_options,
+    manage_pam_unix   => $manage_pam_unix,
+    enable_pw_history => $enable_pw_history,
+    pw_remember_last  => $pw_remember_last,
   }
   class {'os_hardening::profile':
     allow_core_dumps => $allow_core_dumps,
